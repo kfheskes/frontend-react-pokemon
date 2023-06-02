@@ -1,44 +1,75 @@
-import React, {useEffect, useState} from 'react';
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import PokemonCards from './components/PokemonCards';
 import './App.css';
 
 function App() {
     const [data, setData] = useState({});
+    const [endpoint, setEndpoint] = useState('https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20')
+    const [nextToggle, setNextToggle] = useState('');
+    const [previousToggle, setPreviousToggle] = useState('');
+    // const [link, setLink] = useState('https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20')
+
 
     useEffect(() => {
-
-       async function fetchData(){
-         try {
-             const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/jigglypuff`)
-             setData(response.data)
-             console.log(response.data)
-         }
-         catch (e){
-            console.error(e);
-         }
+        async function getPokemon() {
+            try {
+                const response = await axios.get( endpoint);
+                setData(response.data);
+                console.log(response.data);
+            } catch (e) {
+                console.error(e);
+            }
         }
-        fetchData ()
 
-    }, []);
+        getPokemon();
+    }, [endpoint]);
+
+    // const handleNextClick = async () => {
+    //     try {
+    //         if (nextToggle) {
+    //             const response = await axios.get(nextToggle);
+    //             setData(response.data.results);
+    //             setNextToggle(response.data.next);
+    //             setPreviousToggle(response.data.previous);
+    //         }
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // };
+    //
+    // const handlePreviousClick = async () => {
+    //     try {
+    //
+    //
+    //         if (previousToggle) {
+    //             const response = await axios.get(previousToggle);
+    //             setData(response.data.results);
+    //             setNextToggle(response.data.next);
+    //             setPreviousToggle(response.data.previous);
+    //         }
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // };
+
 
 
     return (
-    <section className="card">
-      <h3>{data.name}</h3>
-        <img
-            alt="Afbeelding Pokemon"
-            src={data.sprites.front_shiny}
-        />
-        <h4>Moves: {data.moves.length}</h4>
-        <h4>Weight: {data.weight}</h4>
-        <h4>Abilities:</h4>
-        <ul>
-            <li> {data.abilities[0].ability.name} </li>
-            <li> {data.abilities[1].ability.name} </li>
-            <li> {data.abilities[2].ability.name} </li>
-        </ul>
-    </section>
-  );
+        <div>
+            {console.log(endpoint)}
+            <button onClick={() => setEndpoint(data.previous)}>
+                Vorige
+            </button>
+            <button onClick={() => setEndpoint(data.next)}>
+                Volgende
+            </button>
+
+            {Object.keys(data).length > 0 && data.results.map((morePokemon) => {
+                return <PokemonCards key={morePokemon.name} pokemon={morePokemon.name} />;
+            })}
+        </div>
+    );
 }
 
 export default App;
